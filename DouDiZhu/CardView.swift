@@ -11,22 +11,32 @@ class CardView : UIView {
     
     public static let ratio : Float = 105.0/150.0
     
-    let card : Card
+    var card : Card? {
+        willSet {
+            
+        }
+        didSet {
+            guard let card = card else {
+                imageV.image = nil
+                return
+            }
+            var imageName = card.color.rawValue
+            let rawValue = card.value
+            imageName.append(rawValue.description)
+            let image = UIImage(named: imageName)
+            imageV.image = image
+        }
+    }
     
     let imageV : UIImageView
     
     var selected : Bool = false
     
-    init(card:Card) {
-        self.card = card
-        var imageName = card.color.rawValue
-        var rawValue = card.value
-        if card.type == .joker {
-            rawValue -= 13
-        }
-        imageName.append(rawValue.description)
-        self.imageV = UIImageView(image: UIImage(named: imageName))
-        
+    let index : Int
+    
+    init(index:Int) {
+        self.imageV = UIImageView(image: nil)
+        self.index = index
         super.init(frame: .zero)
         
         addSubview(imageV)

@@ -15,14 +15,43 @@ class UserDeskView: UIView {
         case playing
     }
     
-    let collectionView : UICollectionView
+    let cardContainerView : UIView
     let toolV : UIView
-    var dataSource : [Card] {
+    var handCards : HandCards? {
         willSet {
             
         }
         didSet {
-            collectionView.contentSize = CGSize(width: CGFloat(dataSource.count*20)+w, height: 0)
+            guard let handCards = handCards else {
+                return
+            }
+            removeLastCardViewAtIndex(index: handCards.cards.count-1)
+            var last : CardView?
+            for (i, card) in handCards.cards.enumerated() {
+                let cardV = getCardViewFromIndex(index: i)
+                cardV.card = card
+                if i == handCards.cards.count-2 {
+                    last = cardV
+                }
+                else if i == handCards.cards.count-1 {
+                    if last != nil {
+                        cardV.snp.remakeConstraints { (make) in
+                            make.trailing.equalToSuperview()
+                            make.leading.equalTo(last!.snp_leadingMargin).offset(20)
+                            make.size.equalTo(CGSize(width: w, height: h))
+                            make.top.bottom.equalToSuperview()
+                        }
+                    }
+                    else {
+                        cardV.snp.remakeConstraints { (make) in
+                            make.leading.trailing.equalToSuperview()
+                            make.size.equalTo(CGSize(width: w, height: h))
+                            make.top.bottom.equalToSuperview()
+                        }
+                    }
+                }
+            }
+            
         }
     }
     
@@ -56,17 +85,9 @@ class UserDeskView: UIView {
     
     override init(frame: CGRect) {
         self.toolV = UIView(frame: frame)
-        let layout = UserDeskLayout()
-        layout.scrollDirection = .horizontal
-        
         self.w *= 0.7
         self.h *= 0.7
-        
-        layout.itemSize = CGSize(width: w, height: h)
-        layout.minimumInteritemSpacing = 0
-        layout.minimumLineSpacing = 0
-        self.collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        self.dataSource = []
+        self.cardContainerView = UIView(frame: .zero)
         self.choicingToolV = ChoicingToolView(frame: frame)
         self.playingToolV = PlayingToolView(frame: frame)
         self.toolType = .hidden
@@ -75,25 +96,18 @@ class UserDeskView: UIView {
         
         toolV.backgroundColor = .clear
         
-        collectionView.backgroundColor = .clear
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.register(UserCardCell.classForCoder(), forCellWithReuseIdentifier: "user_card_cellid")
-        addSubview(collectionView)
-        let y = UIScreen.main.bounds.size.height - h
-        let width = UIScreen.main.bounds.size.width - 60*2
-        collectionView.frame = CGRect(x: 60, y: y, width: width, height: h)
-//        collectionView.snp.makeConstraints { (make) in
-//            make.bottom.equalToSuperview().offset(-20)
-//            make.leading.equalToSuperview().offset(60)
-//            make.trailing.equalToSuperview().offset(-60)
-//            make.height.equalTo(h)
-//        }
+        cardContainerView.backgroundColor = .brown
+        addSubview(cardContainerView)
+        cardContainerView.snp.makeConstraints { (make) in
+            make.bottom.equalToSuperview().offset(-20)
+            make.centerX.equalToSuperview()
+            make.height.equalTo(h)
+        }
         
         addSubview(toolV)
         toolV.snp.makeConstraints { (make) in
-            make.bottom.equalTo(collectionView.snp_topMargin).offset(-40)
-            make.leading.trailing.equalTo(collectionView)
+            make.bottom.equalTo(cardContainerView.snp_topMargin).offset(-40)
+            make.leading.trailing.equalTo(cardContainerView)
             make.height.equalTo(60)
             make.top.equalToSuperview()
         }
@@ -109,74 +123,51 @@ class UserDeskView: UIView {
         }
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
-
-extension UserDeskView : UICollectionViewDelegate {
-    
-}
-extension UserDeskView : UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return dataSource.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "user_card_cellid", for: indexPath) as! UserCardCell
-        cell.card = dataSource[indexPath.item]
-        return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-//        collectionView.bringSubviewToFront(cell)
-    }
-}
-
-class UserDeskLayout: UICollectionViewFlowLayout {
-    override func prepare() {
-        super.prepare()
-    }
-    override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
-        let origin = super.layoutAttributesForElements(in: rect)
-        guard let original = origin else {
-            return origin
-        }
-        for currentAttr in original {
-            let oframe = currentAttr.frame
-            currentAttr.frame = CGRect(x: CGFloat(20*currentAttr.indexPath.item), y: oframe.origin.y, width: oframe.size.width, height: oframe.size.height)
-        }
-        return original
-    }
-    override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
-        return true
-    }
-}
-
-class UserCardCell: UICollectionViewCell {
-    var cardView: CardView?
-    var card: Card? {
-        willSet {
-            
-        }
-        didSet {
-            if cardView != nil {
-                cardView!.removeFromSuperview()
+    func getCardViewFromIndex(index:Int) -> CardView {
+        var last : CardView?
+        for cardView in cardContainerView.subviews {
+            if cardView.classForCoder == CardView.self {
+                let cardV = cardView as! CardView
+                if cardV.index == index {
+                    return cardV
+                }
+                else if cardV.index == index-1 {
+                    last = cardV
+                }
             }
-            cardView = CardView(card: card!)
-            addSubview(cardView!)
-            cardView?.snp.makeConstraints({ (make) in
-                make.leading.trailing.top.bottom.equalToSuperview()
-            })
         }
+        let cardV = CardView(index: index)
+        cardContainerView.addSubview(cardV)
+        cardV.snp.makeConstraints { (make) in
+            if last != nil {
+                make.leading.equalTo(last!.snp_leadingMargin).offset(20)
+            }
+            else {
+                make.leading.equalToSuperview()
+            }
+            make.size.equalTo(CGSize(width: w, height: h))
+            make.top.bottom.equalToSuperview()
+        }
+        return cardV
     }
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    
+    func removeLastCardViewAtIndex(index:Int) {
+        for cardView in cardContainerView.subviews {
+            if cardView.classForCoder == CardView.self {
+                let cardV = cardView as! CardView
+                if cardV.index == index {
+                    cardV.removeFromSuperview()
+                    getCardViewFromIndex(index: index)
+                }
+                else if cardV.index > index {
+                    cardV.removeFromSuperview()
+                }
+            }
+        }
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 }
-
 

@@ -21,8 +21,8 @@ enum CardColor : String {
 }
 
 enum CardNumber : Int {
-    case c1 = 1
-    case c2 = 2
+    case c1 = 14
+    case c2 = 15
     case c3 = 3
     case c4 = 4
     case c5 = 5
@@ -34,8 +34,8 @@ enum CardNumber : Int {
     case c11 = 11
     case c12 = 12
     case c13 = 13
-    case cJokerSmall = 14
-    case cJokerLarge = 15
+    case cJokerSmall = 20
+    case cJokerLarge = 21
 }
 
 class Card : NSObject {
@@ -47,7 +47,7 @@ class Card : NSObject {
         self.color = color
         self.number = number
         self.value = number.rawValue
-        if number.rawValue < 14 {
+        if number.rawValue < 20 {
             self.type = .normal
         }
         else {
@@ -66,43 +66,69 @@ class CardManager: NSObject {
             var cards : [Card] = []
             let colors = [CardColor.block, CardColor.heart, CardColor.plum, CardColor.spade]
             for i in 0..<4 {
-                for j in 1..<14 {
+                for j in 3..<16 {
                     let num = CardNumber(rawValue: j)!
                     let card = Card(color: colors[i], number: num)
                     cards.append(card)
                 }
             }
+            let smallJoker = Card(color: .joker, number: CardNumber(rawValue: 20)!)
+            let largeJoker = Card(color: .joker, number: CardNumber(rawValue: 21)!)
+            cards.append(smallJoker)
+            cards.append(largeJoker)
             return cards
         }
     }
-    
+    typealias completeBlock = () -> (Void)
+    func dealCards() -> [[Card]] {
+        var all = originCards
+        var left : [Card] = []
+        var right : [Card] = []
+        var user : [Card] = []
+        
+        while all.count > 3 {
+            let random1 = Int(arc4random() % UInt32(all.count))
+            left.append(all[random1])
+            all.remove(at: random1)
+            
+            let random2 = Int(arc4random() % UInt32(all.count))
+            right.append(all[random2])
+            all.remove(at: random2)
+            
+            let random3 = Int(arc4random() % UInt32(all.count))
+            user.append(all[random3])
+            all.remove(at: random3)
+        }
+        return [user, left, right]
+    }
 }
 
-class UserCards: NSObject {
+class HandCards: NSObject {
     
-    public var currentCards : [Card]
+    public var cards : [Card]
     
     public var pair : [Card] {
         get {
-            return pair(source: currentCards)
+            return pair(source: cards)
         }
     }
     
     public var consequent : [Card] {
         get {
-            return consequent(source: currentCards)
+            return consequent(source: cards)
         }
     }
     
     public var bomb : [[Card]] {
         get {
-            return bomb(source: currentCards)
+            return bomb(source: cards)
         }
     }
     
     init(cards:[Card]) {
-        self.currentCards = cards
+        self.cards = cards
         super.init()
+        self.cards = sortDataSource(source: cards)
     }
     
     
@@ -159,7 +185,7 @@ class UserCards: NSObject {
                 }
             }
             if plan.count > 1 {
-                res.append(plan)
+//                res.append(plan)
             }
             plan = []
             i += 1
@@ -236,7 +262,7 @@ class UserCards: NSObject {
     func consequent(source:[Card]) -> [Card] {
         let sorted = sortDataSource(source: source)
         var res : [Card] = []
-        if compare(a: sorted.first!.value, b: 3) {
+        if sorted.first!.value > 14 {
             return res
         }
         if sorted.count < 5 {
@@ -295,42 +321,12 @@ class UserCards: NSObject {
         return res
     }
     
-    
-    /// compare a and b
-    /// - Returns: true for a less than b , else a > b
-    func compare(a:Int, b:Int) -> Bool {
-        if a > 2 && b > 2 {
-            if a < b {
-                return true
-            }
-            else {
-                return false
-            }
-        }
-        else {
-            if a > 2 && b < 3 { // a < b
-                return true
-            }
-            else if b > 2 && a < 3 { // a > b
-                return false
-            }
-            else {
-                if a < b {
-                    return true
-                }
-                else {
-                    return false
-                }
-            }
-        }
-    }
-    
     func removeDiscontinuous(source:[Card]) -> [Card] {
         var res = source
         
         for i in 0..<source.count {
             let c = source[i]
-            if c.value == 2 || c.value == 14 || c.value == 15 {
+            if c.number == .c2 || c.type == .joker {
                 res.remove(at: i)
             }
         }
@@ -341,7 +337,7 @@ class UserCards: NSObject {
     func sortDataSource(source:[Card]) -> [Card] {
         var sort = source
         sort.sort { (a, b) -> Bool in
-            return compare(a: a.value, b: b.value)
+            return a.value > b.value
         }
         return sort
     }
