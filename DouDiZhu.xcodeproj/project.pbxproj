@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C619460D25947A880090866D /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = C619460C25947A880090866D /* User.swift */; };
+		C619461025947A9B0090866D /* Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C619460F25947A9B0090866D /* Manager.swift */; };
 		FB803C372590D9CB008CFE26 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB803C362590D9CB008CFE26 /* AppDelegate.swift */; };
 		FB803C392590D9CB008CFE26 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB803C382590D9CB008CFE26 /* SceneDelegate.swift */; };
 		FB803C3B2590D9CB008CFE26 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB803C3A2590D9CB008CFE26 /* ViewController.swift */; };
@@ -57,6 +59,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C619460C25947A880090866D /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		C619460F25947A9B0090866D /* Manager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Manager.swift; sourceTree = "<group>"; };
 		FB803C332590D9CB008CFE26 /* DouDiZhu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DouDiZhu.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB803C362590D9CB008CFE26 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FB803C382590D9CB008CFE26 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -145,6 +149,8 @@
 				FB803CA82590EDC2008CFE26 /* ToolView.swift */,
 				FB803C4F2590DA06008CFE26 /* CardView.swift */,
 				FB803C522590DE3D008CFE26 /* Card.swift */,
+				C619460C25947A880090866D /* User.swift */,
+				C619460F25947A9B0090866D /* Manager.swift */,
 				FB803C582590E063008CFE26 /* SnapKit */,
 				FB803C3C2590D9CB008CFE26 /* Main.storyboard */,
 				FB803C3F2590D9CC008CFE26 /* Assets.xcassets */,
@@ -291,6 +297,8 @@
 				FB803C852590E063008CFE26 /* ConstraintInsets.swift in Sources */,
 				FB803C842590E063008CFE26 /* ConstraintPriorityTarget.swift in Sources */,
 				FB803C892590E063008CFE26 /* ConstraintPriority.swift in Sources */,
+				C619461025947A9B0090866D /* Manager.swift in Sources */,
+				C619460D25947A880090866D /* User.swift in Sources */,
 				FB803C532590DE3D008CFE26 /* Card.swift in Sources */,
 				FB803C902590E063008CFE26 /* ConstraintLayoutGuide.swift in Sources */,
 				FB803CA02590E063008CFE26 /* ConstraintDirectionalInsets.swift in Sources */,

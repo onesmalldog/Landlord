@@ -43,6 +43,9 @@ class Card : NSObject {
     let color : CardColor
     let number : CardNumber
     let type : CardType
+    
+    var isLandlord : Bool
+    
     init(color:CardColor, number:CardNumber) {
         self.color = color
         self.number = number
@@ -53,59 +56,9 @@ class Card : NSObject {
         else {
             self.type = .joker
         }
+        self.isLandlord = false
         super.init()
         
-    }
-}
-
-class CardManager: NSObject {
-    static let `shared` = CardManager()
-    
-    var leftHandCard : HandCards?
-    var rightHandCard : HandCards?
-    var userHandCard : HandCards?
-    
-    var originCards : [Card] {
-        get {
-            var cards : [Card] = []
-            let colors = [CardColor.block, CardColor.heart, CardColor.plum, CardColor.spade]
-            for i in 0..<4 {
-                for j in 3..<16 {
-                    let num = CardNumber(rawValue: j)!
-                    let card = Card(color: colors[i], number: num)
-                    cards.append(card)
-                }
-            }
-            let smallJoker = Card(color: .joker, number: CardNumber(rawValue: 20)!)
-            let largeJoker = Card(color: .joker, number: CardNumber(rawValue: 21)!)
-            cards.append(smallJoker)
-            cards.append(largeJoker)
-            return cards
-        }
-    }
-    
-    func dealCards() {
-        var all = originCards
-        var left : [Card] = []
-        var right : [Card] = []
-        var user : [Card] = []
-        
-        while all.count > 3 {
-            let random1 = Int(arc4random() % UInt32(all.count))
-            left.append(all[random1])
-            all.remove(at: random1)
-            
-            let random2 = Int(arc4random() % UInt32(all.count))
-            right.append(all[random2])
-            all.remove(at: random2)
-            
-            let random3 = Int(arc4random() % UInt32(all.count))
-            user.append(all[random3])
-            all.remove(at: random3)
-        }
-        userHandCard = HandCards(cards: user)
-        leftHandCard = HandCards(cards: left)
-        rightHandCard = HandCards(cards: right)
     }
 }
 

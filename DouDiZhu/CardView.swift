@@ -37,12 +37,14 @@ class CardView : UIView {
             layer.removeAllAnimations()
         }
         didSet {
-            UIView.animate(withDuration: 0.3) {
-                if self.selected {
-                    self.transform = .init(translationX: 0, y: -20)
-                }
-                else {
-                    self.transform = .identity
+            if oldValue != selected {
+                UIView.animate(withDuration: 0.3) {
+                    if self.selected {
+                        self.transform = .init(translationX: 0, y: -20)
+                    }
+                    else {
+                        self.transform = .identity
+                    }
                 }
             }
         }
