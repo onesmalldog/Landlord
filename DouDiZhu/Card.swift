@@ -38,6 +38,14 @@ enum CardNumber : Int {
     case cJokerLarge = 21
 }
 
+enum CardStyleLevel : Int {
+    case pair = 1
+    case consequent = 2
+    case threeBelt = 3
+    case plane = 4
+    case bomb = 5
+}
+
 class Card : NSObject {
     let value : Int
     let color : CardColor

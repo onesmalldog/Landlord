@@ -7,12 +7,12 @@
 
 import UIKit
 
-enum BtnType {
-    case normal
-    case cancel
-    case b1
-    case b2
-    case b3
+enum BtnType : Int {
+    case normal = -1
+    case cancel = 0
+    case b1 = 1
+    case b2 = 2
+    case b3 = 3
 }
 
 protocol ToolViewDelegate {
@@ -52,7 +52,7 @@ class ChoicingToolView: ToolView {
         
         addSubview(contentV)
         contentV.snp.makeConstraints { (make) in
-            make.centerX.top.bottom.equalToSuperview()
+            make.leading.trailing.top.bottom.equalToSuperview()
         }
         
         contentV.addSubview(cancelBtn)
@@ -63,38 +63,63 @@ class ChoicingToolView: ToolView {
         
         contentV.addSubview(oneBtn)
         oneBtn.snp.makeConstraints { (make) in
-            make.leading.equalTo(cancelBtn).offset(40)
+            make.leading.equalTo(cancelBtn.snp_trailingMargin).offset(40)
             make.top.bottom.equalToSuperview()
             make.width.equalTo(cancelBtn)
         }
         
         contentV.addSubview(twoBtn)
         twoBtn.snp.makeConstraints { (make) in
-            make.leading.equalTo(oneBtn).offset(20)
+            make.leading.equalTo(oneBtn.snp_trailingMargin).offset(20)
             make.top.bottom.equalToSuperview()
             make.width.equalTo(cancelBtn)
         }
         
         addSubview(threeBtn)
         threeBtn.snp.makeConstraints { (make) in
-            make.leading.equalTo(twoBtn).offset(20)
+            make.leading.equalTo(twoBtn.snp_trailingMargin).offset(20)
             make.top.bottom.trailing.equalToSuperview()
             make.width.equalTo(cancelBtn)
         }
-        
-        cancelBtn.addTarget(self, action: #selector(btnClick(sender:)), for: .touchUpInside)
-        oneBtn.addTarget(self, action: #selector(btnClick(sender:)), for: .touchUpInside)
-        twoBtn.addTarget(self, action: #selector(btnClick(sender:)), for: .touchUpInside)
-        threeBtn.addTarget(self, action: #selector(btnClick(sender:)), for: .touchUpInside)
         
         cancelBtn.btnType = .cancel
         oneBtn.btnType = .b1
         twoBtn.btnType = .b2
         threeBtn.btnType = .b3
+        
+        cancelBtn.setTitle("不叫", for: .normal)
+        oneBtn.setTitle("一分", for: .normal)
+        twoBtn.setTitle("二分", for: .normal)
+        threeBtn.setTitle("三分", for: .normal)
+        
+        configure(btn: cancelBtn)
+        configure(btn: oneBtn)
+        configure(btn: twoBtn)
+        configure(btn: threeBtn)
+    }
+    
+    func configure(btn:UIButton) {
+        btn.setTitleColor(.black, for: .normal)
+        btn.addTarget(self, action: #selector(btnClick(sender:)), for: .touchUpInside)
+        btn.layer.borderWidth = 2
+        btn.layer.borderColor = UIColor.blue.cgColor
     }
     
     @objc func btnClick(sender:UIButton) {
-        delegate?.didClickBtn(toolView: self, type: sender.btnType)
+        var type : BtnType = .normal
+        if sender == cancelBtn {
+            type = .cancel
+        }
+        else if sender == oneBtn {
+            type = .b1
+        }
+        else if sender == twoBtn {
+            type = .b2
+        }
+        else if sender == threeBtn {
+            type = .b3
+        }
+        delegate?.didClickBtn(toolView: self, type: type)
     }
     
     required init?(coder: NSCoder) {
@@ -116,13 +141,13 @@ class PlayingToolView: ToolView {
 extension UIButton {
     var btnType : BtnType {
         set {
-            objc_setAssociatedObject(self, "_kTool_btnType_", newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            objc_setAssociatedObject(self, "_kTool_btnType_", newValue.rawValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
         get {
             guard let res = objc_getAssociatedObject(self, "_kTool_btnType_") else {
                 return .normal
             }
-            return (res as! BtnType)
+            return BtnType(rawValue: (res as! Int))!
         }
     }
 }

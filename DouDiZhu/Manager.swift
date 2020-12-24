@@ -7,12 +7,31 @@
 
 import Foundation
 
+protocol CardManagerDelegate {
+    func didBeganGame(fromUser:User)
+    func nextChoice(user:User)
+}
+
 class CardManager: NSObject {
     static let `shared` = CardManager()
+    var delegate : CardManagerDelegate?
+    
+    var landlord : User? {
+        willSet {
+            
+        }
+        didSet {
+            delegate?.didBeganGame(fromUser: landlord!)
+        }
+    }
     
     var leftBoot : User?
     var rightBoot : User?
     var user : User?
+    
+    var table : [Card]?
+    
+    var currentSelectUser : User?
     
     var originCards : [Card] {
         get {
@@ -56,6 +75,8 @@ class CardManager: NSObject {
             center.append(all[random3])
             all.remove(at: random3)
         }
+        
+        table = all
         
         user = User(cards: center)
         leftBoot = User(cards: left)

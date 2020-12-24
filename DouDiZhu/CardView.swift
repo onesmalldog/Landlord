@@ -11,6 +11,14 @@ class CardView : UIView {
     
     public static let ratio : Float = 105.0/150.0
     
+    var foregroundImage : UIImage?
+    
+    var backgroundImage : UIImage {
+        get {
+            return UIImage(named: "bg")!
+        }
+    }
+    
     var card : Card? {
         willSet {
             
@@ -23,8 +31,10 @@ class CardView : UIView {
             var imageName = card.color.rawValue
             let rawValue = card.value
             imageName.append(rawValue.description)
-            let image = UIImage(named: imageName)
-            imageV.image = image
+            foregroundImage = UIImage(named: imageName)
+            if !showBackground {
+                imageV.image = foregroundImage
+            }
         }
     }
     
@@ -32,13 +42,22 @@ class CardView : UIView {
     
     let index : Int
     
+    var showBackground : Bool = false {
+        willSet {
+            
+        }
+        didSet {
+            imageV.image = showBackground ? self.backgroundImage : self.foregroundImage!
+        }
+    }
+    
     var selected : Bool = false {
         willSet {
             layer.removeAllAnimations()
         }
         didSet {
             if oldValue != selected {
-                UIView.animate(withDuration: 0.3) {
+                UIView.animate(withDuration: 0.15) {
                     if self.selected {
                         self.transform = .init(translationX: 0, y: -20)
                     }
@@ -55,6 +74,8 @@ class CardView : UIView {
         self.index = index
         super.init(frame: .zero)
         
+        imageV.tintAdjustmentMode = .normal
+        imageV.contentMode = .scaleAspectFit
         addSubview(imageV)
         imageV.snp.makeConstraints { (make) in
             make.leading.trailing.top.bottom.equalToSuperview()
