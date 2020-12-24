@@ -12,11 +12,9 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let cards = CardManager.shared.dealCards()
-        let userCards = HandCards(cards: cards.first!)
-        
+        CardManager.shared.dealCards()
         let userDeskV = UserDeskView(frame: .zero)
-        userDeskV.handCards = userCards
+        userDeskV.handCards = CardManager.shared.userHandCard
         view.addSubview(userDeskV)
         userDeskV.snp.makeConstraints { (make) in
             make.bottom.equalToSuperview().offset(-40)

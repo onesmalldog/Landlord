@@ -30,9 +30,23 @@ class CardView : UIView {
     
     let imageV : UIImageView
     
-    var selected : Bool = false
-    
     let index : Int
+    
+    var selected : Bool = false {
+        willSet {
+            layer.removeAllAnimations()
+        }
+        didSet {
+            UIView.animate(withDuration: 0.3) {
+                if self.selected {
+                    self.transform = .init(translationX: 0, y: -20)
+                }
+                else {
+                    self.transform = .identity
+                }
+            }
+        }
+    }
     
     init(index:Int) {
         self.imageV = UIImageView(image: nil)

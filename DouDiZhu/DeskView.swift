@@ -171,3 +171,57 @@ class UserDeskView: UIView {
     }
 }
 
+extension UserDeskView {
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        deselectAllCardView()
+        let point = touches.first!.location(in: self)
+        if cardContainerView.frame.contains(point) {
+            guard let cardV = cardView(point: point) else {
+                return
+            }
+            cardV.selected = true
+        }
+    }
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let point = touches.first!.location(in: self)
+        if cardContainerView.frame.contains(point) {
+            guard let cardV = cardView(point: point) else {
+                return
+            }
+            cardV.selected = true
+        }
+    }
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
+    }
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        touchesEnded(touches, with: event)
+    }
+    func cardView(point:CGPoint) -> CardView? {
+        for cardV in cardContainerView.subviews {
+            if cardV.classForCoder == CardView.classForCoder() {
+                let cardV = cardV as! CardView
+                var frame = cardContainerView.convert(cardV.frame, to: self)
+                if cardV.index < handCards!.cards.count-1 {
+                    frame.size.width = 20
+                }
+                if frame.contains(point) {
+                    return cardV
+                }
+            }
+        }
+        return nil
+    }
+    func deselectAllCardView() {
+        for cardV in cardContainerView.subviews {
+            if cardV.classForCoder == CardView.classForCoder() {
+                let cardV = cardV as! CardView
+                cardV.selected = false
+            }
+        }
+    }
+}
+
+class OtherUserDeskView : UIView {
+    
+}

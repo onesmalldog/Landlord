@@ -61,6 +61,10 @@ class Card : NSObject {
 class CardManager: NSObject {
     static let `shared` = CardManager()
     
+    var leftHandCard : HandCards?
+    var rightHandCard : HandCards?
+    var userHandCard : HandCards?
+    
     var originCards : [Card] {
         get {
             var cards : [Card] = []
@@ -79,8 +83,8 @@ class CardManager: NSObject {
             return cards
         }
     }
-    typealias completeBlock = () -> (Void)
-    func dealCards() -> [[Card]] {
+    
+    func dealCards() {
         var all = originCards
         var left : [Card] = []
         var right : [Card] = []
@@ -99,7 +103,9 @@ class CardManager: NSObject {
             user.append(all[random3])
             all.remove(at: random3)
         }
-        return [user, left, right]
+        userHandCard = HandCards(cards: user)
+        leftHandCard = HandCards(cards: left)
+        rightHandCard = HandCards(cards: right)
     }
 }
 
@@ -107,21 +113,33 @@ class HandCards: NSObject {
     
     public var cards : [Card]
     
-    public var pair : [Card] {
+    public var pair : [CardStylePair] {
         get {
-            return pair(source: cards)
+            return CardStylePair.pair(source: self)
         }
     }
     
-    public var consequent : [Card] {
+    public var consequent : [CardStyleConsequent] {
         get {
-            return consequent(source: cards)
+            return CardStyleConsequent.consequent(source: self)
         }
     }
     
-    public var bomb : [[Card]] {
+    public var bomb : [CardStyleBomb] {
         get {
-            return bomb(source: cards)
+            return CardStyleBomb.bomb(source: self)
+        }
+    }
+    
+    public var plane : [CardStylePlane] {
+        get {
+            return CardStylePlane.plane(source: self)
+        }
+    }
+    
+    public var threeBelt : [CardStyleThreeBelt] {
+        get {
+            return CardStyleThreeBelt.threeBelt(source: self)
         }
     }
     
@@ -129,209 +147,6 @@ class HandCards: NSObject {
         self.cards = cards
         super.init()
         self.cards = sortDataSource(source: cards)
-    }
-    
-    
-    func pair(source:[Card]) -> [Card] {
-        var res : [Card] = []
-        if source.count < 2 {
-            return res
-        }
-        var hash : [Int:Int] = [:]
-        for c in source {
-            var ctt = hash[c.value]
-            if ctt != nil {
-                ctt! += 1
-            }
-            else {
-                ctt = 1
-            }
-            if ctt == 2 {
-                res.append(c)
-            }
-            hash[c.value] = ctt!
-        }
-        return res
-    }
-    
-    func plane(source:[Card]) -> [[Card]] {
-        if source.count < 6 {
-            return []
-        }
-        let sorted = removeDiscontinuous(source: sortDataSource(source: source))
-        var belts = threeBelt(source: sorted)
-        if belts.count < 2 {
-            return []
-        }
-        
-        var res : [[Card]] = []
-        var i = 0
-        while i<belts.count {
-            let c = belts[i]
-            var plan : [[Card]] = [c]
-            while i < belts.count-1 {
-                let next = belts[i+1].first!
-                let last = belts[i].first!
-                if last.value == 13 && next.value == 1 {
-                    plan.append(belts[i+1])
-                    i = i+1
-                }
-                else if next.value - last.value == 1 {
-                    plan.append(belts[i+1])
-                    i = i+1
-                }
-                else {
-                    break
-                }
-            }
-            if plan.count > 1 {
-//                res.append(plan)
-            }
-            plan = []
-            i += 1
-        }
-        
-        return res
-    }
-    
-    func threeBelt(source:[Card]) -> [[Card]] {
-        if source.count < 3 {
-            return []
-        }
-        var values : [Int] = []
-        var hash : [Int:Int] = [:]
-        for c in source {
-            var ctt = hash[c.value]
-            if ctt != nil {
-                ctt! += 1
-            }
-            else {
-                ctt = 1
-            }
-            if ctt == 3 {
-                values.append(c.value)
-            }
-            hash[c.value] = ctt!
-        }
-        var res : [[Card]] = []
-        for value in values {
-            var belt : [Card] = []
-            for c in source {
-                if value == c.value {
-                    belt.append(c)
-                }
-            }
-            res.append(belt)
-        }
-        return res
-    }
-    
-    func bomb(source:[Card]) -> [[Card]] {
-        if source.count < 4 {
-            return []
-        }
-        var values : [Int] = []
-        var hash : [Int:Int] = [:]
-        for c in source {
-            var ctt = hash[c.value]
-            if ctt != nil {
-                ctt! += 1
-            }
-            else {
-                ctt = 1
-            }
-            if ctt == 4 {
-                values.append(c.value)
-            }
-            hash[c.value] = ctt!
-        }
-        var res : [[Card]] = []
-        for value in values {
-            var bomb : [Card] = []
-            for c in source {
-                if value == c.value {
-                    bomb.append(c)
-                }
-            }
-            res.append(bomb)
-        }
-        
-        return res
-    }
-    
-    func consequent(source:[Card]) -> [Card] {
-        let sorted = sortDataSource(source: source)
-        var res : [Card] = []
-        if sorted.first!.value > 14 {
-            return res
-        }
-        if sorted.count < 5 {
-            return res
-        }
-        
-        for i in 0..<sorted.count {
-            let c = sorted[i]
-            if i < sorted.count-1 {
-                let next = sorted[i+1]
-                if c.value == 13 {
-                    if next.value == 1 {
-                        res.append(c)
-                        res.append(next)
-                        break
-                    }
-                    else if next.value == 13 {
-                        continue
-                    }
-                    else {
-                        if res.count >= 4 {
-                            res.append(c)
-                            break
-                        }
-                        res = []
-                        break
-                    }
-                }
-                
-                if c.value - next.value > 1 {
-                    if res.count >= 4 {
-                        res.append(c)
-                        break
-                    }
-                    res = []
-                    continue
-                }
-                else if c.value - next.value == 0 {
-                    continue
-                }
-                else {
-                    res.append(c)
-                }
-            }
-            else {
-                if res.count >= 4 {
-                    res.append(c)
-                    break
-                }
-                else {
-                    res = []
-                    break
-                }
-            }
-        }
-        return res
-    }
-    
-    func removeDiscontinuous(source:[Card]) -> [Card] {
-        var res = source
-        
-        for i in 0..<source.count {
-            let c = source[i]
-            if c.number == .c2 || c.type == .joker {
-                res.remove(at: i)
-            }
-        }
-        
-        return res
     }
     
     func sortDataSource(source:[Card]) -> [Card] {
@@ -346,24 +161,189 @@ class HandCards: NSObject {
 class CardStyle: NSObject {
     
     open var cards : [Card]?
-}
-
-class CardStyleConsequent: CardStyle {
+    
+    init(source:[Card]) {
+        super.init()
+        cards = source
+    }
+    
+    static func removeDiscontinuous(source:[CardStyle]) -> [CardStyle] {
+        var res = source
+        
+        for i in 0..<source.count {
+            let c = source[i]
+            if c.cards!.first!.number == .c2 || c.cards!.first!.type == .joker {
+                res.remove(at: i)
+            }
+        }
+        
+        return res
+    }
     
 }
 
+class CardStyleConsequent: CardStyle {
+    static func consequent(source:HandCards) -> [CardStyleConsequent] {
+        let cards = source.cards
+        if cards.last!.value > 14 {
+            return []
+        }
+        if cards.count < 5 {
+            return []
+        }
+        var seq : [Card] = []
+        for i in 0..<cards.count {
+            let c = cards[i]
+            if c.value > 14 {
+                continue
+            }
+            if i == cards.count-1 {
+                if seq.count >= 4 {
+                    seq.append(c)
+                }
+                else {
+                    seq = []
+                }
+            }
+            else {
+                let next = cards[i+1]
+                if c.value - next.value == 1 {
+                    seq.append(c)
+                }
+                else {
+                    if seq.count >= 4 {
+                        seq.append(c)
+                        break
+                    }
+                    else {
+                        seq = []
+                    }
+                }
+            }
+        }
+        if seq.count > 0 {
+            return [CardStyleConsequent(source: seq)]
+        }
+        return []
+    }
+}
+
 class CardStyleBomb: CardStyle {
+    public static func bomb(source:HandCards) -> [CardStyleBomb] {
+        let cards = source.cards
+        if cards.count < 4 {
+            return []
+        }
+        
+        var res : [CardStyleBomb] = []
+        var hash : [Int:[Card]] = [:]
+        for c in cards {
+            var cards = hash[c.value]
+            if cards != nil {
+                cards!.append(c)
+            }
+            else {
+                cards = [c]
+            }
+            if cards!.count == 4 {
+                res.append(CardStyleBomb(source: cards!))
+            }
+            hash[c.value] = cards!
+        }
+        return res
+    }
     
 }
 
 class CardStyleThreeBelt: CardStyle {
-    
+    static func threeBelt(source:HandCards) -> [CardStyleThreeBelt] {
+        let cards = source.cards
+        if cards.count < 4 {
+            return []
+        }
+        
+        var res : [CardStyleThreeBelt] = []
+        var hash : [Int:[Card]] = [:]
+        for c in cards {
+            var cards = hash[c.value]
+            if cards != nil {
+                cards!.append(c)
+            }
+            else {
+                cards = [c]
+            }
+            if cards!.count == 3 {
+                res.append(CardStyleThreeBelt(source: cards!))
+            }
+            hash[c.value] = cards!
+        }
+        return res
+    }
 }
 
-class CardStylePlane: CardStyle {
-    
+class CardStylePlane: CardStyleThreeBelt {
+    static func plane(source:HandCards) -> [CardStylePlane] {
+        let cards = source.cards
+        if cards.count < 6 {
+            return []
+        }
+        
+        let belts = source.threeBelt
+        let plans = removeDiscontinuous(source: belts) as! [CardStyleThreeBelt]
+        if plans.count < 2 {
+            return []
+        }
+        
+        var res : [CardStylePlane] = []
+        var i = 0
+        while i<plans.count {
+            let c = plans[i]
+            var plan : [Card] = [c.cards!.first!]
+            while i < belts.count-1 {
+                let next = plans[i+1].cards!.first!
+                let last = plans[i].cards!.first!
+                if last.value == 13 && next.value == 1 {
+                    plan.append(plans[i+1].cards!.first!)
+                    i = i+1
+                }
+                else if next.value - last.value == 1 {
+                    plan.append(plans[i+1].cards!.first!)
+                    i = i+1
+                }
+                else {
+                    break
+                }
+            }
+            if plan.count > 1 {
+                res.append(CardStylePlane(source: plan))
+            }
+            plan = []
+            i += 1
+        }
+        return res
+    }
 }
 
 class CardStylePair: CardStyle {
-    
+    static func pair(source:HandCards) -> [CardStylePair] {
+        if source.cards.count < 2 {
+            return []
+        }
+        var res : [CardStylePair] = []
+        var hash : [Int:[Card]] = [:]
+        for c in source.cards {
+            var cards = hash[c.value]
+            if cards != nil {
+                cards!.append(c)
+            }
+            else {
+                cards = [c]
+            }
+            if cards!.count == 2 {
+                res.append(CardStylePair(source: cards!))
+            }
+            hash[c.value] = cards!
+        }
+        return res
+    }
 }
