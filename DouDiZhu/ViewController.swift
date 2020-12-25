@@ -17,7 +17,7 @@ class ViewController: UIViewController {
         let user = CardManager.shared.user!
         let userDeskV = UserDeskView(frame: .zero)
         userDeskV.handCards = user.handCard
-        userDeskV.delegate = self
+        userDeskV.delegate = CardManager.shared
         userDeskV.cardContainerView.isUserInteractionEnabled = false
         view.addSubview(userDeskV)
         userDeskV.snp.makeConstraints { (make) in
@@ -68,36 +68,6 @@ class ViewController: UIViewController {
         print(first!)
         print("开始选择")
         CardManager.shared.nextChoice(user: first!)
-    }
-}
-
-extension ViewController : UserDeskViewDelegate {
-    func didClick(toolView: ToolView, btnType: BtnType) {
-        let user = CardManager.shared.user!
-        if toolView == CardManager.shared.user!.deskView!.choicingToolV {
-            user.selectCardType = btnType
-            CardManager.shared.currentSelectUser = user
-            switch btnType {
-            case .cancel:
-                CardManager.shared.nextChoice(user: user.next())
-                break
-            case .b1:
-                CardManager.shared.nextChoice(user: user.next())
-                break
-            case .b2:
-                CardManager.shared.nextChoice(user: user.next())
-                break
-            case .b3:
-                CardManager.shared.landlord = user
-                break
-            default:
-                break
-            }
-            user.deskView!.toolType = .hidden
-        }
-        else if toolView == CardManager.shared.user!.deskView!.playingToolV {
-            
-        }
     }
 }
 

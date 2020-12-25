@@ -39,11 +39,20 @@ enum CardNumber : Int {
 }
 
 enum CardStyleLevel : Int {
+    case sheet = 0
     case pair = 1
     case consequent = 2
     case threeBelt = 3
-    case plane = 4
-    case bomb = 5
+    case threeBeltOne = 4
+    case threeBeltPair = 5
+    case consequentPair = 6
+    case plane = 10
+    case planeBeltOne = 11
+    case planeBeltPair = 12
+    case fourBeltTwo = 13
+    case fourBeltTwoPair = 14
+    case bomb = 20
+    case unsolvable = 100
 }
 
 class Card : NSObject {
@@ -53,6 +62,10 @@ class Card : NSObject {
     let type : CardType
     
     var isLandlord : Bool
+    
+    var style : [CardStyleLevel] = []
+    
+    var select = false
     
     init(color:CardColor, number:CardNumber) {
         self.color = color
@@ -74,9 +87,39 @@ class HandCards: NSObject {
     
     public var cards : [Card]
     
+    public var selectedCards : [Card] {
+        get {
+            var res : [Card] = []
+            for card in cards {
+                if card.select {
+                    res.append(card)
+                }
+            }
+            return res
+        }
+    }
+    
+    public var sheet : [Card] {
+        get {
+            var res : [Card] = []
+            for card in cards {
+                if card.style.count == 0 {
+                    res.append(card)
+                }
+            }
+            return res
+        }
+    }
+    
     public var pair : [CardStylePair] {
         get {
             return CardStylePair.pair(source: self)
+        }
+    }
+    
+    public var consequentPair : [CardStyleConsequentPair] {
+        get {
+            return CardStyleConsequentPair.consequentPair(source: self)
         }
     }
     
@@ -107,15 +150,7 @@ class HandCards: NSObject {
     init(cards:[Card]) {
         self.cards = cards
         super.init()
-        self.cards = sortDataSource(source: cards)
-    }
-    
-    func sortDataSource(source:[Card]) -> [Card] {
-        var sort = source
-        sort.sort { (a, b) -> Bool in
-            return a.value > b.value
-        }
-        return sort
+        self.cards = CardManager.shared.sortDataSource(source: cards)
     }
 }
 
@@ -144,6 +179,63 @@ class CardStyle: NSObject {
 }
 
 class CardStyleConsequent: CardStyle {
+    
+    var count : Int {
+        get {
+            guard let ctt = cards?.count else {
+                return 0
+            }
+            return ctt
+        }
+    }
+    
+    var maxValue : Int {
+        get {
+            guard let cards = cards else {
+                return 0
+            }
+            if cards.count == 0 {
+                return 0
+            }
+            return cards.first!.value
+        }
+    }
+    
+    var minValue : Int {
+        get {
+            guard let cards = cards else {
+                return 0
+            }
+            if cards.count == 0 {
+                return 0
+            }
+            return cards.last!.value
+        }
+    }
+    
+    func larger(than:[Card]) -> [Card] {
+        let sort = than.sorted(by: { (a, b) -> Bool in
+            return a.value > b.value
+        })
+        if count < sort.count {
+            return []
+        }
+        else if count == sort.count {
+            if maxValue > sort.first!.value {
+                return cards!
+            }
+        }
+        else {
+            if maxValue > sort.first!.value {
+                
+            }
+            else {
+                return []
+            }
+        }
+        return []
+    }
+    
     static func consequent(source:HandCards) -> [CardStyleConsequent] {
         let cards = source.cards
         if cards.last!.value > 14 {
@@ -183,6 +275,9 @@ class CardStyleConsequent: CardStyle {
             }
         }
         if seq.count > 0 {
+            for card in seq {
+                card.style.append(.consequent)
+            }
             return [CardStyleConsequent(source: seq)]
         }
         return []
@@ -207,6 +302,9 @@ class CardStyleBomb: CardStyle {
                 cards = [c]
             }
             if cards!.count == 4 {
+                for card in cards! {
+                    card.style.append(.bomb)
+                }
                 res.append(CardStyleBomb(source: cards!))
             }
             hash[c.value] = cards!
@@ -234,6 +332,9 @@ class CardStyleThreeBelt: CardStyle {
                 cards = [c]
             }
             if cards!.count == 3 {
+                for card in cards! {
+                    card.style.append(.threeBelt)
+                }
                 res.append(CardStyleThreeBelt(source: cards!))
             }
             hash[c.value] = cards!
@@ -276,6 +377,9 @@ class CardStylePlane: CardStyleThreeBelt {
                 }
             }
             if plan.count > 1 {
+                for card in plan {
+                    card.style.append(.plane)
+                }
                 res.append(CardStylePlane(source: plan))
             }
             plan = []
@@ -286,6 +390,16 @@ class CardStylePlane: CardStyleThreeBelt {
 }
 
 class CardStylePair: CardStyle {
+    
+    var value : Int {
+        get {
+            guard let res = self.cards?.first?.value else {
+                return 0
+            }
+            return res
+        }
+    }
+    
     static func pair(source:HandCards) -> [CardStylePair] {
         if source.cards.count < 2 {
             return []
@@ -301,10 +415,48 @@ class CardStylePair: CardStyle {
                 cards = [c]
             }
             if cards!.count == 2 {
+                for card in cards! {
+                    card.style.append(.pair)
+                }
                 res.append(CardStylePair(source: cards!))
             }
             hash[c.value] = cards!
         }
         return res
+    }
+}
+
+class CardStyleConsequentPair: CardStyle {
+    static func consequentPair(source:HandCards) -> [CardStyleConsequentPair] {
+        if source.cards.count < 6 {
+            return []
+        }
+        var res : [CardStyleConsequentPair] = []
+        let pairs : [CardStylePair] = CardStylePair.pair(source: source)
+        var pairConsequent : [CardStylePair] = []
+        for (i, pair) in pairs.enumerated() {
+            if i < pairs.count - 1 {
+                let next = pairs[i+1]
+                if next.cards!.first!.value - pair.cards!.first!.value == 1 {
+                    pairConsequent.append(pair)
+                }
+                else {
+                    if pairConsequent.count > 2 {
+                        res.append(CardStyleConsequentPair(pairs: pairConsequent))
+                    }
+                    else {
+                        pairConsequent = []
+                    }
+                }
+            }
+        }
+        return res
+    }
+    init(pairs: [CardStylePair]) {
+        var cards : [Card] = []
+        for pair in pairs {
+            cards.append(contentsOf: pair.cards!)
+        }
+        super.init(source: cards)
     }
 }

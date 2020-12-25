@@ -56,6 +56,9 @@ class CardView : UIView {
             layer.removeAllAnimations()
         }
         didSet {
+            if let card = card {
+                card.select = selected
+            }
             if oldValue != selected {
                 UIView.animate(withDuration: 0.15) {
                     if self.selected {

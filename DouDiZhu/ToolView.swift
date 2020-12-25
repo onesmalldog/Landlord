@@ -13,6 +13,9 @@ enum BtnType : Int {
     case b1 = 1
     case b2 = 2
     case b3 = 3
+    
+    case alert = 10
+    case play = 11
 }
 
 protocol ToolViewDelegate {
@@ -37,6 +40,16 @@ class ToolView: UIView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func configure(btn:UIButton) {
+        btn.setTitleColor(.black, for: .normal)
+        btn.addTarget(self, action: #selector(btnClick(sender:)), for: .touchUpInside)
+        btn.layer.borderWidth = 2
+        btn.layer.borderColor = UIColor.blue.cgColor
+    }
+    @objc func btnClick(sender:UIButton) {
+        
     }
 }
 
@@ -98,14 +111,7 @@ class ChoicingToolView: ToolView {
         configure(btn: threeBtn)
     }
     
-    func configure(btn:UIButton) {
-        btn.setTitleColor(.black, for: .normal)
-        btn.addTarget(self, action: #selector(btnClick(sender:)), for: .touchUpInside)
-        btn.layer.borderWidth = 2
-        btn.layer.borderColor = UIColor.blue.cgColor
-    }
-    
-    @objc func btnClick(sender:UIButton) {
+    @objc override func btnClick(sender:UIButton) {
         var type : BtnType = .normal
         if sender == cancelBtn {
             type = .cancel
@@ -128,9 +134,66 @@ class ChoicingToolView: ToolView {
 }
 
 class PlayingToolView: ToolView {
+    
+    let contentV = UIView()
+    let cancelBtn = UIButton(type: .custom)
+    let alertBtn = UIButton(type: .custom)
+    let playBtn = UIButton(type: .custom)
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         type = .playing
+        
+        addSubview(contentV)
+        contentV.snp.makeConstraints { (make) in
+            make.leading.trailing.top.bottom.equalToSuperview()
+        }
+        
+        contentV.addSubview(cancelBtn)
+        cancelBtn.snp.makeConstraints { (make) in
+            make.top.bottom.leading.equalToSuperview()
+            make.width.equalTo(80)
+        }
+        
+        contentV.addSubview(alertBtn)
+        alertBtn.snp.makeConstraints { (make) in
+            make.leading.equalTo(cancelBtn.snp_trailingMargin).offset(40)
+            make.top.bottom.equalToSuperview()
+            make.width.equalTo(cancelBtn)
+        }
+        
+        contentV.addSubview(playBtn)
+        playBtn.snp.makeConstraints { (make) in
+            make.leading.equalTo(alertBtn.snp_trailingMargin).offset(20)
+            make.top.bottom.trailing.equalToSuperview()
+            make.width.equalTo(cancelBtn)
+        }
+        
+        cancelBtn.btnType = .cancel
+        alertBtn.btnType = .alert
+        playBtn.btnType = .play
+        
+        cancelBtn.setTitle("不出", for: .normal)
+        alertBtn.setTitle("提示", for: .normal)
+        playBtn.setTitle("出牌", for: .normal)
+        
+        configure(btn: cancelBtn)
+        configure(btn: alertBtn)
+        configure(btn: playBtn)
+    }
+    
+    @objc override func btnClick(sender:UIButton) {
+        var type : BtnType = .normal
+        if sender == cancelBtn {
+            type = .cancel
+        }
+        else if sender == alertBtn {
+            type = .alert
+        }
+        else if sender == playBtn {
+            type = .play
+        }
+        delegate?.didClickBtn(toolView: self, type: type)
     }
     
     required init?(coder: NSCoder) {

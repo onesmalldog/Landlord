@@ -23,8 +23,9 @@ class CardManager: NSObject {
     var rightBoot : User?
     var user : User?
     
-    var table : [Card]?
+    var landlordCachedCards : [Card]?
     
+    var lastPlayedCards : [Card]?
     var currentSelectUser : User?
     
     var originCards : [Card] {
@@ -46,6 +47,13 @@ class CardManager: NSObject {
         }
     }
     
+    func sortDataSource(source:[Card]) -> [Card] {
+        var sort = source
+        sort.sort { (a, b) -> Bool in
+            return a.value > b.value
+        }
+        return sort
+    }
 }
 
 extension CardManager {
@@ -73,18 +81,11 @@ extension CardManager {
             all.remove(at: random3)
         }
         
-        table = all
+        landlordCachedCards = all
         
         user = User(cards: center)
         leftBoot = User(cards: left)
         rightBoot = User(cards: right)
-    }
-    
-    func beganGame(fromUser: User) {
-        fromUser.deskView?.toolType = .hidden
-        user!.deskView!.cardContainerView.isUserInteractionEnabled = true
-        print("now began game from")
-        print(fromUser)
     }
     
     func nextChoice(user: User) {
@@ -147,4 +148,69 @@ extension CardManager {
 
 extension CardManager {
     
+    func beganGame(fromUser: User) {
+        currentSelectUser = fromUser
+        currentSelectUser!.isLandlord = true
+        fromUser.deskView?.toolType = .hidden
+        user!.deskView!.cardContainerView.isUserInteractionEnabled = true
+        print("now began game from")
+        print(fromUser)
+        
+        nextPlay(user: fromUser)
+    }
+    
+    func nextPlay(user:User) {
+        if user == self.user {
+            user.deskView!.toolType = .playing
+        }
+        else {
+            let playCards = user.playCards()
+            if playCards.count > 0 {
+                lastPlayedCards = playCards
+            }
+            nextPlay(user: user.next())
+        }
+    }
+}
+
+extension CardManager : UserDeskViewDelegate {
+    func didClick(toolView: ToolView, btnType: BtnType) {
+        let user = CardManager.shared.user!
+        if toolView == user.deskView!.choicingToolV {
+            user.selectCardType = btnType
+            CardManager.shared.currentSelectUser = user
+            switch btnType {
+            case .cancel:
+                nextChoice(user: user.next())
+                break
+            case .b1:
+                nextChoice(user: user.next())
+                break
+            case .b2:
+                nextChoice(user: user.next())
+                break
+            case .b3:
+                landlord = user
+                break
+            default:
+                break
+            }
+        }
+        else if toolView == user.deskView!.playingToolV {
+            switch btnType {
+            case .alert:
+                break
+            case .cancel:
+                nextPlay(user: user.next())
+                break
+            case .play:
+                lastPlayedCards = user.handCard.selectedCards
+                nextPlay(user: user.next())
+                break
+            default:
+                break
+            }
+        }
+        user.deskView!.toolType = .hidden
+    }
 }
