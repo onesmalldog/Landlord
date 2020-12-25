@@ -7,21 +7,15 @@
 
 import Foundation
 
-protocol CardManagerDelegate {
-    func didBeganGame(fromUser:User)
-    func nextChoice(user:User)
-}
-
 class CardManager: NSObject {
     static let `shared` = CardManager()
-    var delegate : CardManagerDelegate?
     
     var landlord : User? {
         willSet {
             
         }
         didSet {
-            delegate?.didBeganGame(fromUser: landlord!)
+            beganGame(fromUser: landlord!)
         }
     }
     
@@ -52,6 +46,9 @@ class CardManager: NSObject {
         }
     }
     
+}
+
+extension CardManager {
     func dealCards() {
         var all = originCards
         var left : [Card] = []
@@ -82,4 +79,72 @@ class CardManager: NSObject {
         leftBoot = User(cards: left)
         rightBoot = User(cards: right)
     }
+    
+    func beganGame(fromUser: User) {
+        fromUser.deskView?.toolType = .hidden
+        user!.deskView!.cardContainerView.isUserInteractionEnabled = true
+        print("now began game from")
+        print(fromUser)
+    }
+    
+    func nextChoice(user: User) {
+        if user == self.user {
+            user.deskView!.toolType = .choicing
+            print("等待玩家选择")
+            return
+        }
+        user.deskView?.toolType = .choicing
+        var selectType = user.thinkingLandlord()
+        if user.choiceCtt > 1 {
+            if selectType.rawValue == CardManager.shared.currentSelectUser!.selectCardType.rawValue {
+                selectType = BtnType(rawValue: selectType.rawValue+1)!
+            }
+            else if selectType.rawValue < CardManager.shared.currentSelectUser!.selectCardType.rawValue {
+                selectType = .cancel
+            }
+        }
+        print(user)
+        print("选择了")
+        print(selectType)
+        user.selectCardType = selectType
+        switch selectType {
+        case .cancel:
+            if user.choiceCtt < 3 {
+                currentSelectUser = user
+                nextChoice(user: user.next())
+            }
+            else {
+                landlord = currentSelectUser!
+            }
+            break
+        case .b1:
+            currentSelectUser = user
+            if user.choiceCtt < 3 {
+                nextChoice(user: user.next())
+            }
+            else {
+                landlord = user
+            }
+            break
+        case .b2:
+            currentSelectUser = user
+            if user.choiceCtt < 3 {
+                nextChoice(user: user.next())
+            }
+            else {
+                landlord = user
+            }
+            break
+        case .b3:
+            currentSelectUser = user
+            landlord = user
+            break
+        default:
+            break
+        }
+    }
+}
+
+extension CardManager {
+    
 }

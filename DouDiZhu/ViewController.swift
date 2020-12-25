@@ -12,7 +12,6 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        CardManager.shared.delegate = self
         CardManager.shared.dealCards()
         
         let user = CardManager.shared.user!
@@ -68,74 +67,7 @@ class ViewController: UIViewController {
         }
         print(first!)
         print("开始选择")
-        CardManager.shared.delegate?.nextChoice(user: first!)
-    }
-}
-
-extension ViewController : CardManagerDelegate {
-    
-    func didBeganGame(fromUser: User) {
-        fromUser.deskView?.toolType = .hidden
-        CardManager.shared.user!.deskView!.cardContainerView.isUserInteractionEnabled = true
-        print("now began game from")
-        print(fromUser)
-    }
-    
-    func nextChoice(user: User) {
-        if user == CardManager.shared.user! {
-            user.deskView?.toolType = .choicing
-            print("等待玩家选择")
-            return
-        }
-        user.deskView?.toolType = .choicing
-        var selectType = user.thinkingLandlord()
-        if user.choiceCtt > 1 {
-            if selectType.rawValue == CardManager.shared.currentSelectUser!.selectCardType.rawValue {
-                selectType = BtnType(rawValue: selectType.rawValue+1)!
-            }
-            else if selectType.rawValue < CardManager.shared.currentSelectUser!.selectCardType.rawValue {
-                selectType = .cancel
-            }
-        }
-        print(user)
-        print("选择了")
-        print(selectType)
-        user.selectCardType = selectType
-        switch selectType {
-        case .cancel:
-            if user.choiceCtt < 3 {
-                CardManager.shared.currentSelectUser = user
-                CardManager.shared.delegate?.nextChoice(user: user.next())
-            }
-            else {
-                CardManager.shared.landlord = CardManager.shared.currentSelectUser!
-            }
-            break
-        case .b1:
-            CardManager.shared.currentSelectUser = user
-            if user.choiceCtt < 3 {
-                CardManager.shared.delegate?.nextChoice(user: user.next())
-            }
-            else {
-                CardManager.shared.landlord = user
-            }
-            break
-        case .b2:
-            CardManager.shared.currentSelectUser = user
-            if user.choiceCtt < 3 {
-                CardManager.shared.delegate?.nextChoice(user: user.next())
-            }
-            else {
-                CardManager.shared.landlord = user
-            }
-            break
-        case .b3:
-            CardManager.shared.currentSelectUser = user
-            CardManager.shared.landlord = user
-            break
-        default:
-            break
-        }
+        CardManager.shared.nextChoice(user: first!)
     }
 }
 
@@ -147,21 +79,21 @@ extension ViewController : UserDeskViewDelegate {
             CardManager.shared.currentSelectUser = user
             switch btnType {
             case .cancel:
-                CardManager.shared.delegate?.nextChoice(user: user.next())
+                CardManager.shared.nextChoice(user: user.next())
                 break
             case .b1:
-                CardManager.shared.delegate?.nextChoice(user: user.next())
+                CardManager.shared.nextChoice(user: user.next())
                 break
             case .b2:
-                CardManager.shared.delegate?.nextChoice(user: user.next())
+                CardManager.shared.nextChoice(user: user.next())
                 break
             case .b3:
-                CardManager.shared.landlord = CardManager.shared.user
+                CardManager.shared.landlord = user
                 break
             default:
                 break
             }
-            user.deskView?.toolType = .hidden
+            user.deskView!.toolType = .hidden
         }
         else if toolView == CardManager.shared.user!.deskView!.playingToolV {
             
