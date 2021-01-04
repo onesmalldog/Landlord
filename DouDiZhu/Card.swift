@@ -81,6 +81,43 @@ class Card : NSObject {
         super.init()
         
     }
+    
+    func updateStyle() {
+        self.style = []
+    }
+}
+
+extension Card {
+    static func separated(cards:[Card], type:CardStyleLevel) -> [[Card]] {
+        
+        switch type {
+        case .fourBeltTwo:
+            fallthrough
+        case .fourBeltTwoPair:
+            fallthrough
+        case .threeBeltOne:
+            fallthrough
+        case .threeBeltPair:
+            var hash : [Int : [Card]] = [:]
+            for card in cards {
+                var res = hash[card.value]
+                if res == nil {
+                    res = [card]
+                }
+                else {
+                    res!.append(card)
+                }
+                hash[card.value] = res
+            }
+            var res : [[Card]] = []
+            for value in hash.keys {
+                res.append(hash[value]!)
+            }
+            return res
+        default:
+            return [cards]
+        }
+    }
 }
 
 class HandCards: NSObject {
@@ -238,10 +275,10 @@ class CardStyleConsequent: CardStyle {
     
     static func consequent(source:HandCards) -> [CardStyleConsequent] {
         let cards = source.cards
-        if cards.last!.value > 14 {
+        if cards.count < 5 {
             return []
         }
-        if cards.count < 5 {
+        if cards.last!.value > 14 {
             return []
         }
         var seq : [Card] = []

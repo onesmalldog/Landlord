@@ -15,6 +15,7 @@ class CardManager: NSObject {
             
         }
         didSet {
+            landlord!.handCard.cards.append(contentsOf: landlordCachedCards!)
             beganGame(fromUser: landlord!)
         }
     }
@@ -160,16 +161,64 @@ extension CardManager {
     }
     
     func nextPlay(user:User) {
+        currentSelectUser = user
         if user == self.user {
             user.deskView!.toolType = .playing
+            if lastPlayedCards == user.lastPlayedCards {
+                lastPlayedCards = nil
+            }
+//            let playCards = user.playCards()
+//            if playCards.count > 0 {
+//                lastPlayedCards = playCards
+//                for card in playCards {
+//                    user.handCard.cards.remove(card)
+//                }
+//                user.lastPlayedCards = playCards
+//                user.updateCards()
+//                print("\(user)打出了")
+//                printArr(cards: playCards)
+//                print("剩余")
+//                printArr(cards: user.handCard.cards)
+//                if user.handCard.cards.count == 0 {
+//                    print("\(user)win!")
+//                    print("winner winner, chicken dinner")
+//                    return
+//                }
+//            }
+//            nextPlay(user: user.next())
         }
         else {
+            if lastPlayedCards == user.lastPlayedCards {
+                lastPlayedCards = nil
+            }
             let playCards = user.playCards()
             if playCards.count > 0 {
                 lastPlayedCards = playCards
+                for card in playCards {
+                    user.handCard.cards.remove(card)
+                }
+                user.lastPlayedCards = playCards
+                user.updateCards()
+                print("\(user)打出了")
+                printArr(cards: playCards)
+                print("剩余")
+                printArr(cards: user.handCard.cards)
+                if user.handCard.cards.count == 0 {
+                    print("\(user)win!")
+                    print("winner winner, chicken dinner")
+                    return
+                }
             }
             nextPlay(user: user.next())
         }
+    }
+    
+    func printArr(cards:[Card]) {
+        var values : [Int] = []
+        for card in cards {
+            values.append(card.value)
+        }
+        print(values)
     }
 }
 
@@ -212,5 +261,13 @@ extension CardManager : UserDeskViewDelegate {
             }
         }
         user.deskView!.toolType = .hidden
+    }
+}
+
+extension Array where Element: Equatable {
+    mutating func remove(_ object: Element) {
+        if let index = firstIndex(of: object) {
+            remove(at: index)
+        }
     }
 }

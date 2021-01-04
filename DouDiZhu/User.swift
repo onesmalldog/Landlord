@@ -28,6 +28,8 @@ class User: NSObject {
         }
     }
     
+    var lastPlayedCards : [Card]?
+    
     init(handCard:HandCards) {
         self.handCard = handCard
         super.init()
@@ -47,6 +49,18 @@ class User: NSObject {
         else {
             return CardManager.shared.user!
         }
+    }
+    
+    func updateCards() {
+        
+        for card in handCard.cards {
+            card.updateStyle()
+        }
+        _ = handCard.pair
+        _ = handCard.threeBelt
+        _ = handCard.bomb
+        _ = handCard.consequent
+        _ = handCard.consequentPair
     }
 }
 
@@ -75,17 +89,62 @@ extension User {
                     }
                 }
                 return []
-                break
             case .consequent:
                 for conseq in handCard.consequent {
                     if conseq.count >= lastCards.count {
-                        
+                        if conseq.maxValue > lastCards.first!.value {
+                            return getCards(cards: conseq.cards!, fromCount: lastCards.count, maxer: true)
+                        }
                     }
                 }
                 break
-            case .plane:
-                break
             case .threeBelt:
+                for threeBelt in handCard.threeBelt {
+                    if threeBelt.cards!.first!.value > lastCards.first!.value {
+                        return threeBelt.cards!
+                    }
+                }
+                break
+            case .threeBeltOne:
+                let lastSep = Card.separated(cards: lastCards, type: .threeBeltOne)
+                if lastSep.count == 2 {
+                    var threeBeltValue = 0
+                    if lastSep.first!.count == 3 {
+                        threeBeltValue = lastSep.first!.first!.value
+                    }
+                    else {
+                        threeBeltValue = lastSep.last!.first!.value
+                    }
+                    for threeBelt in handCard.threeBelt {
+                        if threeBelt.cards!.first!.value > threeBeltValue {
+                            return threeBelt.cards!
+                        }
+                    }
+                }
+                break
+            case .threeBeltPair:
+                let lastSep = Card.separated(cards: lastCards, type: .threeBeltPair)
+                if lastSep.count == 2 {
+                    var threeBeltValue = 0
+                    if lastSep.first!.count == 3 {
+                        threeBeltValue = lastSep.first!.first!.value
+                    }
+                    else {
+                        threeBeltValue = lastSep.last!.first!.value
+                    }
+                    for threeBelt in handCard.threeBelt {
+                        if threeBelt.cards!.first!.value > threeBeltValue {
+                            if let pairs = handCard.pair.last {
+                                var res : [Card] = threeBelt.cards!
+                                res.append(contentsOf: pairs.cards!)
+                                return res
+                            }
+                            else {
+                                break
+                            }
+                        }
+                    }
+                }
                 break
             case .consequentPair:
                 break
@@ -94,11 +153,48 @@ extension User {
             }
         }
         else {
-            
+            if (handCard.plane.count > 0) {
+                return handCard.plane.first!.cards!
+            }
+            else if (handCard.consequent.count > 0) {
+                return handCard.consequent.first!.cards!
+            }
+            else if (handCard.pair.count > 0) {
+                return handCard.pair.first!.cards!
+            }
+            else if handCard.sheet.count > 0 {
+                return [handCard.sheet.last!]
+            }
+            else if (handCard.bomb.count > 0) {
+                return handCard.bomb.first!.cards!
+            }
         }
         return []
     }
     
+    
+    /// 获取连续的前几个
+    /// - Parameters:
+    ///   - fromCount: 从第几个开始
+    ///   - maxer: true for prefix， false for suffix
+    func getCards(cards:[Card], fromCount:Int, maxer:Bool) -> [Card] {
+        if cards.count > fromCount  {
+            if maxer {
+                return Array(cards.prefix(fromCount))
+            }
+            else {
+                return Array(cards.suffix(fromCount))
+            }
+        }
+        else if cards.count == fromCount {
+            return cards
+        }
+        else {
+            return []
+        }
+    }
+    
+    /// 获取类型
     func getCardsType(cards:[Card]) -> CardStyleLevel {
         switch cards.count {
         case 1:
