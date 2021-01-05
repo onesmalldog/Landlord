@@ -22,6 +22,22 @@ protocol ToolViewDelegate {
     func didClickBtn(toolView:ToolView, type:BtnType)
 }
 
+class PlayBtn: UIButton {
+    override var isEnabled: Bool {
+        willSet {
+            
+        }
+        didSet {
+            if isEnabled {
+                self.layer.borderColor = UIColor.blue.cgColor
+            }
+            else {
+                self.layer.borderColor = UIColor.darkGray.cgColor
+            }
+        }
+    }
+}
+
 class ToolView: UIView {
     enum ToolType {
         case unknow
@@ -44,6 +60,7 @@ class ToolView: UIView {
     
     func configure(btn:UIButton) {
         btn.setTitleColor(.black, for: .normal)
+        btn.setTitleColor(.darkGray, for: .disabled)
         btn.addTarget(self, action: #selector(btnClick(sender:)), for: .touchUpInside)
         btn.layer.borderWidth = 2
         btn.layer.borderColor = UIColor.blue.cgColor
@@ -138,7 +155,7 @@ class PlayingToolView: ToolView {
     let contentV = UIView()
     let cancelBtn = UIButton(type: .custom)
     let alertBtn = UIButton(type: .custom)
-    let playBtn = UIButton(type: .custom)
+    let playBtn = PlayBtn(type: .custom)
     
     override init(frame: CGRect) {
         super.init(frame: frame)

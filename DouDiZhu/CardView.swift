@@ -40,6 +40,8 @@ class CardView : UIView {
     
     let imageV : UIImageView
     
+    let maskV : UIView
+    
     let index : Int
     
     var showBackground : Bool = false {
@@ -60,12 +62,14 @@ class CardView : UIView {
                 card.select = selected
             }
             if oldValue != selected {
-                UIView.animate(withDuration: 0.15) {
+                UIView.animate(withDuration: 0.1) {
                     if self.selected {
-                        self.transform = .init(translationX: 0, y: -20)
+                        self.transform = .init(translationX: 0, y: -8)
+                        self.maskV.alpha = 0.4
                     }
                     else {
                         self.transform = .identity
+                        self.maskV.alpha = 0
                     }
                 }
             }
@@ -74,6 +78,7 @@ class CardView : UIView {
     
     init(index:Int) {
         self.imageV = UIImageView(image: nil)
+        self.maskV = UIView(frame: .zero)
         self.index = index
         super.init(frame: .zero)
         
@@ -81,6 +86,13 @@ class CardView : UIView {
         imageV.contentMode = .scaleAspectFit
         addSubview(imageV)
         imageV.snp.makeConstraints { (make) in
+            make.leading.trailing.top.bottom.equalToSuperview()
+        }
+        
+        maskV.alpha = 0
+        maskV.backgroundColor = .darkGray
+        addSubview(maskV)
+        maskV.snp.makeConstraints { (make) in
             make.leading.trailing.top.bottom.equalToSuperview()
         }
     }

@@ -152,7 +152,7 @@ extension CardManager {
     func beganGame(fromUser: User) {
         currentSelectUser = fromUser
         currentSelectUser!.isLandlord = true
-        fromUser.deskView?.toolType = .hidden
+//        fromUser.deskView?.toolType = .hidden
         user!.deskView!.cardContainerView.isUserInteractionEnabled = true
         print("now began game from")
         print(fromUser)
@@ -186,6 +186,7 @@ extension CardManager {
 //                }
 //            }
 //            nextPlay(user: user.next())
+            user.deskView!.toolType = .playingDisenable
         }
         else {
             if lastPlayedCards == user.lastPlayedCards {
@@ -223,11 +224,23 @@ extension CardManager {
 }
 
 extension CardManager : UserDeskViewDelegate {
+    
+    func changeSelect() {
+        let user = CardManager.shared.user!
+        if validatedCanShow(cards: user.handCard.selectedCards) {
+            user.deskView!.toolType = .playingEnable
+        }
+        else {
+            user.deskView!.toolType = .playingDisenable
+        }
+    }
+    
     func didClick(toolView: ToolView, btnType: BtnType) {
         let user = CardManager.shared.user!
         if toolView == user.deskView!.choicingToolV {
             user.selectCardType = btnType
             CardManager.shared.currentSelectUser = user
+            user.deskView!.toolType = .hidden
             switch btnType {
             case .cancel:
                 nextChoice(user: user.next())
@@ -250,17 +263,28 @@ extension CardManager : UserDeskViewDelegate {
             case .alert:
                 break
             case .cancel:
+                user.deskView!.toolType = .hidden
                 nextPlay(user: user.next())
                 break
             case .play:
-                lastPlayedCards = user.handCard.selectedCards
-                nextPlay(user: user.next())
+                if validatedCanShow(cards: user.handCard.selectedCards) {
+                    user.deskView!.toolType = .hidden
+                    lastPlayedCards = user.handCard.selectedCards
+                    nextPlay(user: user.next())
+                }
                 break
             default:
                 break
             }
         }
-        user.deskView!.toolType = .hidden
+    }
+    
+    func validatedCanShow(cards:[Card]) -> Bool {
+        let type = user!.getCardsType(cards: cards)
+        if type == .unsolvable {
+            return false
+        }
+        return true
     }
 }
 

@@ -9,13 +9,15 @@ import UIKit
 
 protocol UserDeskViewDelegate {
     func didClick(toolView:ToolView, btnType:BtnType)
+    func changeSelect()
 }
 
 class DeskView: UIView {
     enum UserToolType {
         case hidden
         case choicing
-        case playing
+        case playingEnable
+        case playingDisenable
     }
     var handCards : HandCards?
     var toolType : UserToolType = .hidden
@@ -73,24 +75,31 @@ class UserDeskView: DeskView {
     
     override var toolType : UserToolType {
         willSet {
-            if newValue != toolType {
-                switch newValue {
+            
+        }
+        didSet {
+            if oldValue != toolType {
+                switch toolType {
                 case .choicing:
                     choicingToolV.isHidden = false
                     playingToolV.isHidden = true
                     break
-                case .playing:
+                case .playingEnable:
                     choicingToolV.isHidden = true
                     playingToolV.isHidden = false
+                    playingToolV.playBtn.isEnabled = true
+                    break
+                case .playingDisenable:
+                    choicingToolV.isHidden = true
+                    playingToolV.isHidden = false
+                    playingToolV.playBtn.isEnabled = false
+                    break
                 default:
                     choicingToolV.isHidden = true
                     playingToolV.isHidden = true
                     break
                 }
             }
-        }
-        didSet {
-            
         }
     }
     
@@ -115,7 +124,7 @@ class UserDeskView: DeskView {
         addSubview(toolV)
         toolV.snp.makeConstraints { (make) in
             make.bottom.equalTo(cardContainerView.snp_topMargin).offset(-20)
-            make.centerX.equalTo(cardContainerView)
+            make.leading.trailing.equalToSuperview()
             make.height.equalTo(40)
             make.top.equalToSuperview()
         }
@@ -124,14 +133,14 @@ class UserDeskView: DeskView {
         choicingToolV.isHidden = true
         choicingToolV.delegate = self
         choicingToolV.snp.makeConstraints { (make) in
-            make.leading.trailing.top.bottom.equalToSuperview()
+            make.centerX.top.bottom.equalToSuperview()
         }
         
         toolV.addSubview(playingToolV)
         playingToolV.isHidden = true
         playingToolV.delegate = self
         playingToolV.snp.makeConstraints { (make) in
-            make.leading.trailing.top.bottom.equalToSuperview()
+            make.centerX.top.bottom.equalToSuperview()
         }
     }
     
@@ -209,7 +218,7 @@ extension UserDeskView {
         }
     }
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        
+        delegate?.changeSelect()
     }
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         touchesEnded(touches, with: event)
@@ -279,7 +288,6 @@ class OtherUserDeskView : DeskView {
                     }
                 }
             }
-            
         }
     }
     
