@@ -64,10 +64,6 @@ extension CardManager {
         var right : [Card] = []
         var center : [Card] = []
         
-        let landlord = Int(arc4random() % UInt32(all.count))
-        let card = all[landlord]
-        card.isLandlord = true
-        
         while all.count > 3 {
             let random1 = Int(arc4random() % UInt32(all.count))
             left.append(all[random1])
@@ -163,7 +159,6 @@ extension CardManager {
     func nextPlay(user:User) {
         currentSelectUser = user
         if user == self.user {
-            user.deskView!.toolType = .playing
             if lastPlayedCards == user.lastPlayedCards {
                 lastPlayedCards = nil
             }
@@ -186,7 +181,6 @@ extension CardManager {
 //                }
 //            }
 //            nextPlay(user: user.next())
-            user.deskView!.toolType = .playingDisenable
         }
         else {
             if lastPlayedCards == user.lastPlayedCards {
@@ -231,7 +225,7 @@ extension CardManager : UserDeskViewDelegate {
             user.deskView!.toolType = .playingEnable
         }
         else {
-            user.deskView!.toolType = .playingDisenable
+            user.deskView!.toolType = .playingDisable
         }
     }
     

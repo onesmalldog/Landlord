@@ -41,18 +41,25 @@ enum CardNumber : Int {
 enum CardStyleLevel : Int {
     case sheet = 0
     case pair = 1
-    case consequent = 2
-    case threeBelt = 3
-    case threeBeltOne = 4
-    case threeBeltPair = 5
-    case consequentPair = 6
-    case plane = 10
-    case planeBeltOne = 11
-    case planeBeltPair = 12
-    case fourBeltTwo = 13
-    case fourBeltTwoPair = 14
-    case bomb = 20
-    case unsolvable = 100
+    
+    case threeBelt = 10
+    case threeBeltOne = 11
+    case threeBeltPair = 12
+    
+    case consequent = 20
+    
+    case consequentPair = 25
+    
+    case plane = 30
+    case planeBeltOne = 31
+    case planeBeltPair = 32
+    
+    case fourBeltTwo = 90
+    case fourBeltTwoPair = 91
+    
+    case bomb = 100
+    
+    case unsolvable = 999
 }
 
 class Card : NSObject {
@@ -60,9 +67,7 @@ class Card : NSObject {
     let color : CardColor
     let number : CardNumber
     let type : CardType
-    
-    var isLandlord : Bool
-    
+        
     var style : [CardStyleLevel] = []
     
     var select = false
@@ -77,7 +82,6 @@ class Card : NSObject {
         else {
             self.type = .joker
         }
-        self.isLandlord = false
         super.init()
         
     }

@@ -17,7 +17,7 @@ class DeskView: UIView {
         case hidden
         case choicing
         case playingEnable
-        case playingDisenable
+        case playingDisable
     }
     var handCards : HandCards?
     var toolType : UserToolType = .hidden
@@ -89,7 +89,7 @@ class UserDeskView: DeskView {
                     playingToolV.isHidden = false
                     playingToolV.playBtn.isEnabled = true
                     break
-                case .playingDisenable:
+                case .playingDisable:
                     choicingToolV.isHidden = true
                     playingToolV.isHidden = false
                     playingToolV.playBtn.isEnabled = false

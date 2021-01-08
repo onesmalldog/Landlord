@@ -47,13 +47,16 @@ class ViewController: UIViewController {
         }
         
         var first : User?
-        if CardManager.shared.user!.hasLandlordCard {
+        
+        let random = Int(arc4random() % 3)
+        
+        if random == 0 {
             first = CardManager.shared.user!
             CardManager.shared.user!.choiceCtt = 1
             CardManager.shared.rightBoot!.choiceCtt = 2
             CardManager.shared.leftBoot!.choiceCtt = 3
         }
-        else if CardManager.shared.leftBoot!.hasLandlordCard {
+        else if random == 1 {
             first = CardManager.shared.leftBoot!
             CardManager.shared.leftBoot!.choiceCtt = 1
             CardManager.shared.user!.choiceCtt = 2
