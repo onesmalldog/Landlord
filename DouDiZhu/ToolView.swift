@@ -24,9 +24,6 @@ protocol ToolViewDelegate {
 
 class PlayBtn: UIButton {
     override var isEnabled: Bool {
-        willSet {
-            
-        }
         didSet {
             if isEnabled {
                 self.layer.borderColor = UIColor.blue.cgColor

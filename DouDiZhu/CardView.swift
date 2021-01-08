@@ -20,9 +20,6 @@ class CardView : UIView {
     }
     
     var card : Card? {
-        willSet {
-            
-        }
         didSet {
             guard let card = card else {
                 imageV.image = nil
@@ -45,9 +42,6 @@ class CardView : UIView {
     let index : Int
     
     var showBackground : Bool = false {
-        willSet {
-            
-        }
         didSet {
             imageV.image = showBackground ? self.backgroundImage : self.foregroundImage!
         }

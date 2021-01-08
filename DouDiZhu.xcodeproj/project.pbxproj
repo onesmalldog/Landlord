@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		C619460D25947A880090866D /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = C619460C25947A880090866D /* User.swift */; };
 		C619461025947A9B0090866D /* Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C619460F25947A9B0090866D /* Manager.swift */; };
+		C660AC0D25A82FA2009A5362 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C660AC0C25A82FA2009A5362 /* ViewModel.swift */; };
+		C660AC1025A83357009A5362 /* CardTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = C660AC0F25A83357009A5362 /* CardTool.swift */; };
+		C660AC1325A835AD009A5362 /* HandCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C660AC1225A835AD009A5362 /* HandCard.swift */; };
 		FB803C372590D9CB008CFE26 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB803C362590D9CB008CFE26 /* AppDelegate.swift */; };
 		FB803C392590D9CB008CFE26 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB803C382590D9CB008CFE26 /* SceneDelegate.swift */; };
 		FB803C3B2590D9CB008CFE26 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB803C3A2590D9CB008CFE26 /* ViewController.swift */; };
@@ -61,6 +64,9 @@
 /* Begin PBXFileReference section */
 		C619460C25947A880090866D /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		C619460F25947A9B0090866D /* Manager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Manager.swift; sourceTree = "<group>"; };
+		C660AC0C25A82FA2009A5362 /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
+		C660AC0F25A83357009A5362 /* CardTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardTool.swift; sourceTree = "<group>"; };
+		C660AC1225A835AD009A5362 /* HandCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandCard.swift; sourceTree = "<group>"; };
 		FB803C332590D9CB008CFE26 /* DouDiZhu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DouDiZhu.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB803C362590D9CB008CFE26 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FB803C382590D9CB008CFE26 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -145,10 +151,13 @@
 				FB803C362590D9CB008CFE26 /* AppDelegate.swift */,
 				FB803C382590D9CB008CFE26 /* SceneDelegate.swift */,
 				FB803C3A2590D9CB008CFE26 /* ViewController.swift */,
+				C660AC0C25A82FA2009A5362 /* ViewModel.swift */,
 				FB803CA42590E48C008CFE26 /* DeskView.swift */,
 				FB803CA82590EDC2008CFE26 /* ToolView.swift */,
 				FB803C4F2590DA06008CFE26 /* CardView.swift */,
 				FB803C522590DE3D008CFE26 /* Card.swift */,
+				C660AC1225A835AD009A5362 /* HandCard.swift */,
+				C660AC0F25A83357009A5362 /* CardTool.swift */,
 				C619460C25947A880090866D /* User.swift */,
 				C619460F25947A9B0090866D /* Manager.swift */,
 				FB803C582590E063008CFE26 /* SnapKit */,
@@ -289,6 +298,7 @@
 				FB803C922590E063008CFE26 /* Typealiases.swift in Sources */,
 				FB803C862590E063008CFE26 /* ConstraintMakerFinalizable.swift in Sources */,
 				FB803CA52590E48C008CFE26 /* DeskView.swift in Sources */,
+				C660AC1325A835AD009A5362 /* HandCard.swift in Sources */,
 				FB803C962590E063008CFE26 /* ConstraintMaker.swift in Sources */,
 				FB803C7F2590E063008CFE26 /* LayoutConstraintItem.swift in Sources */,
 				FB803C982590E063008CFE26 /* ConstraintLayoutGuideDSL.swift in Sources */,
@@ -307,11 +317,13 @@
 				FB803C9B2590E063008CFE26 /* Constraint.swift in Sources */,
 				FB803C972590E063008CFE26 /* ConstraintRelation.swift in Sources */,
 				FB803C992590E063008CFE26 /* ConstraintView+Extensions.swift in Sources */,
+				C660AC1025A83357009A5362 /* CardTool.swift in Sources */,
 				FB803C9F2590E063008CFE26 /* ConstraintLayoutGuide+Extensions.swift in Sources */,
 				FB803C8A2590E063008CFE26 /* ConstraintInsetTarget.swift in Sources */,
 				FB803C8F2590E063008CFE26 /* ConstraintView.swift in Sources */,
 				FB803CA22590E063008CFE26 /* ConstraintMakerRelatable.swift in Sources */,
 				FB803C9D2590E063008CFE26 /* ConstraintRelatableTarget.swift in Sources */,
+				C660AC0D25A82FA2009A5362 /* ViewModel.swift in Sources */,
 				FB803C942590E063008CFE26 /* ConstraintOffsetTarget.swift in Sources */,
 				FB803C392590D9CB008CFE26 /* SceneDelegate.swift in Sources */,
 				FB803C812590E063008CFE26 /* ConstraintDescription.swift in Sources */,

@@ -7,15 +7,21 @@
 
 import Foundation
 
+enum LandlordSelectionType : Int {
+    case none = -1
+    case b1 = 1
+    case b2 = 2
+    case b3 = 3
+}
+
 class CardManager: NSObject {
     static let `shared` = CardManager()
     
     var landlord : User? {
-        willSet {
-            
-        }
         didSet {
             landlord!.handCard.cards.append(contentsOf: landlordCachedCards!)
+            user!.deskView!.toolType = .hidden
+            user!.deskView!.cardContainerView.isUserInteractionEnabled = true
             beganGame(fromUser: landlord!)
         }
     }
@@ -28,6 +34,8 @@ class CardManager: NSObject {
     
     var lastPlayedCards : [Card]?
     var currentSelectUser : User?
+    
+    var landlordSelectionType : LandlordSelectionType = .none
     
     var originCards : [Card] {
         get {
@@ -101,9 +109,7 @@ extension CardManager {
                 selectType = .cancel
             }
         }
-        print(user)
-        print("选择了")
-        print(selectType)
+        print("\(user)选择了\(selectType)")
         user.selectCardType = selectType
         switch selectType {
         case .cancel:
@@ -148,10 +154,8 @@ extension CardManager {
     func beganGame(fromUser: User) {
         currentSelectUser = fromUser
         currentSelectUser!.isLandlord = true
-//        fromUser.deskView?.toolType = .hidden
-        user!.deskView!.cardContainerView.isUserInteractionEnabled = true
-        print("now began game from")
-        print(fromUser)
+        
+        print("now began game from\(fromUser)")
         
         nextPlay(user: fromUser)
     }

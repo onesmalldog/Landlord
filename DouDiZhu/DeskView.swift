@@ -33,9 +33,6 @@ class UserDeskView: DeskView {
     let cardContainerView : UIView
     let toolV : UIView
     override var handCards : HandCards? {
-        willSet {
-            
-        }
         didSet {
             guard let handCards = handCards else {
                 return
@@ -74,9 +71,6 @@ class UserDeskView: DeskView {
     let playingToolV : PlayingToolView
     
     override var toolType : UserToolType {
-        willSet {
-            
-        }
         didSet {
             if oldValue != toolType {
                 switch toolType {
@@ -255,9 +249,6 @@ class OtherUserDeskView : DeskView {
     let margin = 2
     
     override var handCards : HandCards? {
-        willSet {
-            
-        }
         didSet {
             guard let handCards = handCards else {
                 return

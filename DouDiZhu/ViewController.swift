@@ -68,8 +68,7 @@ class ViewController: UIViewController {
             CardManager.shared.leftBoot!.choiceCtt = 2
             CardManager.shared.user!.choiceCtt = 3
         }
-        print(first!)
-        print("开始选择")
+        print("\(first!)开始选择")
         CardManager.shared.nextChoice(user: first!)
     }
 }
